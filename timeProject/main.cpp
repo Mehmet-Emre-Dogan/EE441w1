@@ -1,4 +1,9 @@
 #include <iostream>
+#define DEBUG true
+#define MAX_ALLOWED_HOUR 23
+#define MIN_ALLOWED_HOUR 0
+#define MAX_ALLOWED_MINUTE 59
+#define MIN_ALLOWED_MINUTE 0
 
 class Time
 {
@@ -13,6 +18,11 @@ public:
     int getHour() const;
     int getMinute() const;
     void incrementHour();
+    void incrementMinute();
+    void decrementHour();
+    void decrementMinute();
+    void sanitize();
+    void printSanitizerMessage(int oldVal, int newVal);
 
     Time(Time &derivedTime){
         hour = derivedTime.getHour();
@@ -29,6 +39,60 @@ int Time::getMinute() const{
     return this->minute;
 }
 
+void Time::incrementHour(){
+    this->hour++;
+    this->sanitize();
+}
+
+void Time::incrementMinute(){
+    this->minute++;
+    this->sanitize();
+}
+
+void Time::decrementHour(){
+    this->hour--;
+    this->sanitize();
+}
+
+void Time::decrementMinute(){
+    this->minute--;
+    this->sanitize();
+}
+
+void Time::sanitize(){
+    // sanitize hour
+    int oldHour = this->hour; // take snapshot before overwriting
+    if(this->hour > MAX_ALLOWED_HOUR){
+        this->hour = MAX_ALLOWED_HOUR;
+        if (DEBUG)
+            printSanitizerMessage(oldHour, this->hour);
+    }
+    else if(this->hour < MIN_ALLOWED_HOUR){
+        this->hour = MIN_ALLOWED_HOUR;
+        if (DEBUG)
+            printSanitizerMessage(oldHour, this->hour);
+    }
+
+    // sanitize minute
+    int oldMinute = this->minute; // take snapshot before overwriting
+    if(this->minute > MAX_ALLOWED_MINUTE){
+        this->minute = MAX_ALLOWED_MINUTE;
+        if (DEBUG)
+            printSanitizerMessage(oldMinute, this->minute);
+    }
+    else if(this->minute < MIN_ALLOWED_MINUTE){
+        this->minute = MIN_ALLOWED_MINUTE;
+        if (DEBUG)
+            printSanitizerMessage(oldMinute, this->minute);
+    }
+}
+
+void Time::printSanitizerMessage(int oldVal, int newVal){
+    std::cout << "Sanitized invalid value [" + std::to_string(oldVal) + "] to valid value [" + std::to_string(newVal) + "] ." << std::endl;
+}
+
+
+
 int main()
 {
     // empty call
@@ -37,17 +101,26 @@ int main()
     std::cout << "MINUTE:" + std::to_string(mytimeEmpty.getMinute()) << std::endl;
 
 //    // normal call
-    Time mytime(3, 5);
+    Time mytime(0, 5);
     std::cout << "HOUR:" + std::to_string(mytime.getHour()) << std::endl;
     std::cout << "MINUTE:" + std::to_string(mytime.getMinute()) << std::endl;
 
-    // normal call
+    // derived call
     std::cout << "derived" << std:: endl;
     Time mytime2(mytime);
     std::cout << "HOUR:" + std::to_string(mytime2.getHour()) << std::endl;
     std::cout << "MINUTE:" + std::to_string(mytime2.getMinute()) << std::endl;
 
-    std::system("pause");
+    mytime.incrementHour();
+    std::cout << "HOUR:" + std::to_string(mytime.getHour()) << std::endl;
+    std::cout << "MINUTE:" + std::to_string(mytime.getMinute()) << std::endl;
 
+    mytime.decrementMinute();
+    mytime.decrementHour();
+    mytime.decrementHour();
+    std::cout << "HOUR:" + std::to_string(mytime.getHour()) << std::endl;
+    std::cout << "MINUTE:" + std::to_string(mytime.getMinute()) << std::endl;
+
+    std::system("pause");
     return 0;
 }
