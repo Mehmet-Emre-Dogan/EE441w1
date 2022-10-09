@@ -6,7 +6,7 @@
 #define MAX_ALLOWED_MINUTE 59
 #define MIN_ALLOWED_MINUTE 0
 #define MAX_ALLOWED_TIMEZONE 12
-#define MIN_ALLOWED_TIMEZONE 0
+#define MIN_ALLOWED_TIMEZONE -11
 
 class Time
 {
@@ -17,6 +17,7 @@ public:
     Time(int h=0, int m=0) {
         hour = h;
         minute = m;
+        this->sanitize();
     }
     int getHour() const;
     int getMinute() const;
@@ -66,31 +67,39 @@ void Time::decrementMinute(){
 }
 
 void Time::sanitize(){
+    bool flagH, flagM = false;
+    int hourModulo = MAX_ALLOWED_HOUR - MIN_ALLOWED_HOUR + 1;
+    int minuteModulo = MAX_ALLOWED_MINUTE - MIN_ALLOWED_MINUTE + 1;
+
     // sanitize hour
     int oldHour = this->hour; // take snapshot before overwriting
-    if(this->hour > MAX_ALLOWED_HOUR){
-        this->hour = MAX_ALLOWED_HOUR;
+    while(this->hour > MAX_ALLOWED_HOUR){
+        this->hour -= hourModulo;
         if (DEBUG)
-            printSanitizerMessage(oldHour, this->hour);
+            flagH = true;
     }
-    else if(this->hour < MIN_ALLOWED_HOUR){
-        this->hour = MIN_ALLOWED_HOUR;
+    while(this->hour < MIN_ALLOWED_HOUR){
+        this->hour += hourModulo;
         if (DEBUG)
-            printSanitizerMessage(oldHour, this->hour);
+            flagH = true;
     }
+    if(flagH)
+        printSanitizerMessage(oldHour, this->hour);
 
     // sanitize minute
     int oldMinute = this->minute; // take snapshot before overwriting
-    if(this->minute > MAX_ALLOWED_MINUTE){
-        this->minute = MAX_ALLOWED_MINUTE;
+    while (this->minute > MAX_ALLOWED_MINUTE){
+        this->minute -= minuteModulo;
         if (DEBUG)
-            printSanitizerMessage(oldMinute, this->minute);
+            flagM = true;
     }
-    else if(this->minute < MIN_ALLOWED_MINUTE){
-        this->minute = MIN_ALLOWED_MINUTE;
+    while (this->minute < MIN_ALLOWED_MINUTE){
+        this->minute += minuteModulo;
         if (DEBUG)
-            printSanitizerMessage(oldMinute, this->minute);
+            flagM = true;
     }
+    if(flagM)
+        printSanitizerMessage(oldMinute, this->minute);
 }
 
 void Time::printSanitizerMessage(int oldVal, int newVal){
@@ -171,17 +180,21 @@ int TimeZone::getAbsHour() const{
 }
 
 void TimeZone::sanitizeTimezone(){
+    bool flag = false;
+    int timeZoneModulo = MAX_ALLOWED_TIMEZONE - MIN_ALLOWED_TIMEZONE + 1;
     int oldTimezone = this->timeZone; // take snapshot before overwriting
-    if(this->timeZone > MAX_ALLOWED_TIMEZONE){
-        this->timeZone = MAX_ALLOWED_TIMEZONE;
+    while(this->timeZone > MAX_ALLOWED_TIMEZONE){
+        this->timeZone -= timeZoneModulo;
         if (DEBUG)
-            printSanitizerMessage(oldTimezone, this->timeZone);
+            flag = true;
     }
-    else if(this->timeZone < MIN_ALLOWED_TIMEZONE){
-        this->timeZone = MIN_ALLOWED_TIMEZONE;
+    while(this->timeZone < MIN_ALLOWED_TIMEZONE){
+        this->timeZone += timeZoneModulo;
         if (DEBUG)
-            printSanitizerMessage(oldTimezone, this->timeZone);
+            flag = true;
     }
+    if (flag)
+        printSanitizerMessage(oldTimezone, this->timeZone);
 }
 
 void TimeZone::printGMT() const{
@@ -202,13 +215,17 @@ void TimeZone::printGMT() const{
     ttbp += " GMT";
 
     if(this->timeZone < 0){
-        ttbp += "-";
+        //ttbp += "-"; it already have an -
+        ;
     }
     else{
         ttbp += "+";
     }
     if(abs(this->timeZone) < 10){
         ttbp += "0" + std::to_string(this->getTimeZone());
+    }
+    else{
+        ttbp += std::to_string(this->getTimeZone());
     }
 
     ttbp += ":00";
@@ -251,10 +268,10 @@ int main()
     mytime.printTime();
 
     std::cout << "TimeZone class" << std::endl;
-    TimeZone mytimezone(3, 11, 3);
+    TimeZone mytimezone(3, 3, 5);
     mytimezone.printTime();
 
-    mytimezone.setTimeZone(2);
+    mytimezone.setTimeZone(13);
     mytimezone.printTime();     // do not use it. formatting is terrible,
                                 // but I will not fix it since i dont wanna modify base class anymore
                                 // I will implement printGMT() instead
