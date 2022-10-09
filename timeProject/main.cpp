@@ -4,6 +4,8 @@
 #define MIN_ALLOWED_HOUR 0
 #define MAX_ALLOWED_MINUTE 59
 #define MIN_ALLOWED_MINUTE 0
+#define MAX_ALLOWED_TIMEZONE 12
+#define MIN_ALLOWED_TIMEZONE 0
 
 class Time
 {
@@ -126,13 +128,55 @@ void Time::setMinute(int newMinute){
 class TimeZone: public Time
 {
 private:
-    int timeZone;
+    int timeZone, absHour;
 public:
     TimeZone(int tz=0, int h=0, int m=0);
+    void calcAbsHour();
+    void calcHour();
+    void setTimeZone(int newTimeZone);
+    int getTimeZone() const;
+    void sanitizeTimezone();
 
 };
 
-TimeZone::TimeZone(int tz, int h, int m): Time(h, m), timeZone(tz){};
+TimeZone::TimeZone(int tz, int h, int m): Time(h, m), timeZone(tz){
+    this->sanitizeTimezone();
+    this->calcAbsHour();
+};
+
+void TimeZone::calcAbsHour(){
+    this->absHour = this->getHour() - this->timeZone;
+}
+
+void TimeZone::calcHour(){
+    this->setHour(this->absHour + this->timeZone);
+}
+
+void TimeZone::setTimeZone(int newTimeZone){
+    this->timeZone = newTimeZone;
+    this->sanitizeTimezone();
+    this->calcHour();
+}
+
+int TimeZone::getTimeZone() const{
+    return this->timeZone;
+}
+
+void TimeZone::sanitizeTimezone(){
+    int oldTimezone = this->timeZone; // take snapshot before overwriting
+    if(this->timeZone > MAX_ALLOWED_TIMEZONE){
+        this->timeZone = MAX_ALLOWED_TIMEZONE;
+        if (DEBUG)
+            printSanitizerMessage(oldTimezone, this->timeZone);
+    }
+    else if(this->timeZone < MIN_ALLOWED_TIMEZONE){
+        this->timeZone = MIN_ALLOWED_TIMEZONE;
+        if (DEBUG)
+            printSanitizerMessage(oldTimezone, this->timeZone);
+    }
+}
+
+
 
 int main()
 {
@@ -167,8 +211,11 @@ int main()
     mytime.setHour(10); mytime.setMinute(70);
     mytime.printTime();
 
+    std::cout << "TimeZone class" << std::endl;
+    TimeZone mytimezone(3, 1, 3);
+    mytimezone.printTime();
 
-    TimeZone mytimezone(5, 1, 3);
+    mytimezone.setTimeZone(-20);
     mytimezone.printTime();
 
     std::system("pause");
