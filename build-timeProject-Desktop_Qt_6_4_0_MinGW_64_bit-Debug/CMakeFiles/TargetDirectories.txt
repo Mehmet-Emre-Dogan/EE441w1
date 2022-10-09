@@ -1,0 +1,7 @@
+D:/Documents/EE4/EE441/1/build-timeProject-Desktop_Qt_6_4_0_MinGW_64_bit-Debug/CMakeFiles/timeProject.dir
+D:/Documents/EE4/EE441/1/build-timeProject-Desktop_Qt_6_4_0_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
+D:/Documents/EE4/EE441/1/build-timeProject-Desktop_Qt_6_4_0_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+D:/Documents/EE4/EE441/1/build-timeProject-Desktop_Qt_6_4_0_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
+D:/Documents/EE4/EE441/1/build-timeProject-Desktop_Qt_6_4_0_MinGW_64_bit-Debug/CMakeFiles/install.dir
+D:/Documents/EE4/EE441/1/build-timeProject-Desktop_Qt_6_4_0_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
+D:/Documents/EE4/EE441/1/build-timeProject-Desktop_Qt_6_4_0_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
