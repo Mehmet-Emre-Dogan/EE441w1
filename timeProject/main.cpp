@@ -24,6 +24,8 @@ public:
     void sanitize();
     void printSanitizerMessage(int oldVal, int newVal);
     void printTime() const;
+    void setHour(int newHour);
+    void setMinute(int newMinute);
 
     Time(Time &derivedTime){
         hour = derivedTime.getHour();
@@ -110,6 +112,15 @@ void Time::printTime() const{
     std::cout << timeStr << std::endl;
 }
 
+void Time::setHour(int newHour){
+    this->hour = newHour;
+    this->sanitize();
+}
+
+void Time::setMinute(int newMinute){
+    this->minute = newMinute;
+    this->sanitize();
+}
 
 
 int main()
@@ -140,6 +151,9 @@ int main()
     std::cout << "HOUR:" + std::to_string(mytime.getHour()) << std::endl;
     std::cout << "MINUTE:" + std::to_string(mytime.getMinute()) << std::endl;
 
+    mytime.printTime();
+
+    mytime.setHour(10); mytime.setMinute(70);
     mytime.printTime();
 
     std::system("pause");
