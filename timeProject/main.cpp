@@ -123,6 +123,17 @@ void Time::setMinute(int newMinute){
 }
 
 
+class TimeZone: public Time
+{
+private:
+    int timeZone;
+public:
+    TimeZone(int tz=0, int h=0, int m=0);
+
+};
+
+TimeZone::TimeZone(int tz, int h, int m): Time(h, m), timeZone(tz){};
+
 int main()
 {
     // empty call
@@ -155,6 +166,10 @@ int main()
 
     mytime.setHour(10); mytime.setMinute(70);
     mytime.printTime();
+
+
+    TimeZone mytimezone(5, 1, 3);
+    mytimezone.printTime();
 
     std::system("pause");
     return 0;
