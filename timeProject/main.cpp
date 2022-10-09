@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #define DEBUG true
 #define MAX_ALLOWED_HOUR 23
 #define MIN_ALLOWED_HOUR 0
@@ -26,7 +27,7 @@ public:
     void sanitize();
     void printSanitizerMessage(int oldVal, int newVal);
     void printTime() const;
-    void setHour(int newHour);
+    void setHour(int newHour, bool ignoreSanityCheck);
     void setMinute(int newMinute);
 
     Time(Time &derivedTime){
@@ -114,9 +115,10 @@ void Time::printTime() const{
     std::cout << timeStr << std::endl;
 }
 
-void Time::setHour(int newHour){
+void Time::setHour(int newHour,  bool checkSanity=true){
     this->hour = newHour;
-    this->sanitize();
+    if(checkSanity)
+        this->sanitize();
 }
 
 void Time::setMinute(int newMinute){
@@ -135,7 +137,9 @@ public:
     void calcHour();
     void setTimeZone(int newTimeZone);
     int getTimeZone() const;
+    int getAbsHour() const;
     void sanitizeTimezone();
+    void printGMT() const;
 
 };
 
@@ -149,7 +153,7 @@ void TimeZone::calcAbsHour(){
 }
 
 void TimeZone::calcHour(){
-    this->setHour(this->absHour + this->timeZone);
+    this->setHour(this->absHour + this->timeZone, false);
 }
 
 void TimeZone::setTimeZone(int newTimeZone){
@@ -160,6 +164,10 @@ void TimeZone::setTimeZone(int newTimeZone){
 
 int TimeZone::getTimeZone() const{
     return this->timeZone;
+}
+
+int TimeZone::getAbsHour() const{
+    return this->absHour;
 }
 
 void TimeZone::sanitizeTimezone(){
@@ -174,6 +182,37 @@ void TimeZone::sanitizeTimezone(){
         if (DEBUG)
             printSanitizerMessage(oldTimezone, this->timeZone);
     }
+}
+
+void TimeZone::printGMT() const{
+    std::string ttbp = ""; // text to be printed
+
+    if(this->getAbsHour() < 10)
+        ttbp += "0" + std::to_string(this->getAbsHour());
+    else
+        ttbp += std::to_string(this->getAbsHour());
+
+    ttbp += ":";
+
+    if(this->getMinute() < 10)
+        ttbp += "0" + std::to_string(this->getMinute());
+    else
+        ttbp += std::to_string(this->getMinute());
+
+    ttbp += " GMT";
+
+    if(this->timeZone < 0){
+        ttbp += "-";
+    }
+    else{
+        ttbp += "+";
+    }
+    if(abs(this->timeZone) < 10){
+        ttbp += "0" + std::to_string(this->getTimeZone());
+    }
+
+    ttbp += ":00";
+    std::cout << ttbp << std::endl;
 }
 
 
@@ -212,11 +251,14 @@ int main()
     mytime.printTime();
 
     std::cout << "TimeZone class" << std::endl;
-    TimeZone mytimezone(3, 1, 3);
+    TimeZone mytimezone(3, 11, 3);
     mytimezone.printTime();
 
-    mytimezone.setTimeZone(-20);
-    mytimezone.printTime();
+    mytimezone.setTimeZone(2);
+    mytimezone.printTime();     // do not use it. formatting is terrible,
+                                // but I will not fix it since i dont wanna modify base class anymore
+                                // I will implement printGMT() instead
+    mytimezone.printGMT();
 
     std::system("pause");
     return 0;
