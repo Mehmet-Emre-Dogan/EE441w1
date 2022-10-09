@@ -23,6 +23,7 @@ public:
     void decrementMinute();
     void sanitize();
     void printSanitizerMessage(int oldVal, int newVal);
+    void printTime() const;
 
     Time(Time &derivedTime){
         hour = derivedTime.getHour();
@@ -91,6 +92,24 @@ void Time::printSanitizerMessage(int oldVal, int newVal){
     std::cout << "Sanitized invalid value [" + std::to_string(oldVal) + "] to valid value [" + std::to_string(newVal) + "] ." << std::endl;
 }
 
+void Time::printTime() const{
+    std::string timeStr = "";
+
+    if(this->hour < 10)
+        timeStr += "0" + std::to_string(this->hour);
+    else
+        timeStr += std::to_string(this->hour);
+
+    timeStr += ":";
+
+    if(this->minute < 10)
+        timeStr += "0" + std::to_string(this->minute);
+    else
+        timeStr += std::to_string(this->minute);
+
+    std::cout << timeStr << std::endl;
+}
+
 
 
 int main()
@@ -120,6 +139,8 @@ int main()
     mytime.decrementHour();
     std::cout << "HOUR:" + std::to_string(mytime.getHour()) << std::endl;
     std::cout << "MINUTE:" + std::to_string(mytime.getMinute()) << std::endl;
+
+    mytime.printTime();
 
     std::system("pause");
     return 0;
